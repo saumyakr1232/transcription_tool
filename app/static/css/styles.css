@@ -271,22 +271,22 @@
         inset 0 1px 0 rgba(38, 239, 233, 0.08);
 }
 
-/* Primary button with liquid glass - Cognizant Blue */
+/* Primary button with liquid glass - Cyan Accent Theme */
 .liquid-accent-btn {
     position: relative;
     background: linear-gradient(
         145deg,
-        #2F78C4 0%,
-        #1E5A9E 100%
+        rgba(38, 239, 233, 0.95) 0%,
+        rgba(30, 212, 207, 0.85) 100%
     );
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
     border-radius: 16px;
     box-shadow:
-        0 4px 20px rgba(47, 120, 196, 0.35),
-        inset 0 1px 2px rgba(255, 255, 255, 0.3);
+        0 4px 20px rgba(38, 239, 233, 0.35),
+        inset 0 1px 2px rgba(255, 255, 255, 0.4);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     overflow: hidden;
-    color: white;
+    color: #000048;
 }
 
 .liquid-accent-btn::before {
@@ -298,7 +298,7 @@
     height: 50%;
     background: linear-gradient(
         180deg,
-        rgba(255, 255, 255, 0.25) 0%,
+        rgba(255, 255, 255, 0.35) 0%,
         transparent 100%
     );
     pointer-events: none;
@@ -308,12 +308,12 @@
     transform: translateY(-2px) scale(1.02);
     background: linear-gradient(
         145deg,
-        #4A90D9 0%,
-        #2F78C4 100%
+        rgba(38, 239, 233, 1) 0%,
+        rgba(38, 239, 233, 0.9) 100%
     );
     box-shadow:
-        0 8px 30px rgba(47, 120, 196, 0.45),
-        inset 0 1px 2px rgba(255, 255, 255, 0.4);
+        0 8px 30px rgba(38, 239, 233, 0.5),
+        inset 0 1px 2px rgba(255, 255, 255, 0.5);
 }
 
 .liquid-accent-btn:disabled {
