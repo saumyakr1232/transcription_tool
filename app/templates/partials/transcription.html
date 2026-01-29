@@ -1,0 +1,97 @@
+<!-- Transcription Result Partial -->
+<div class="result-card transcription-card">
+    <div class="card-header">
+        <h2>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                <polyline points="14 2 14 8 20 8" />
+                <line x1="16" y1="13" x2="8" y2="13" />
+                <line x1="16" y1="17" x2="8" y2="17" />
+                <polyline points="10 9 9 9 8 9" />
+            </svg>
+            Transcription
+        </h2>
+        <span class="badge">{{ transcription.video_filename }}</span>
+    </div>
+
+    <!-- Controls -->
+    <div class="card-controls">
+        <div class="control-group">
+            <label class="toggle-label">
+                <input type="checkbox" id="timestamps-toggle" {% if include_timestamps %}checked{% endif %}
+                    hx-post="/api/transcribe" hx-target="#results-container" hx-indicator="#loading-overlay"
+                    hx-vals='js:{include_timestamps: event.target.checked}'>
+                <span class="toggle-switch"></span>
+                <span class="toggle-text">Show timestamps</span>
+            </label>
+        </div>
+
+        <div class="btn-group">
+            <button class="btn btn-secondary btn-sm" onclick="copyTranscription()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                </svg>
+                Copy
+            </button>
+            <a href="/api/download" class="btn btn-secondary btn-sm" download>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="7 10 12 15 17 10" />
+                    <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+                Download
+            </a>
+        </div>
+    </div>
+
+    <!-- Transcription Content -->
+    <div class="card-content transcription-content" id="transcription-text">
+        {% if include_timestamps and transcription.timestamps %}
+        {% for entry in transcription.timestamps %}
+        <div class="timestamp-entry">
+            <span class="timestamp">
+                {{ "%02d"|format((entry.start_time // 60)|int) }}:{{ "%02d"|format((entry.start_time % 60)|int) }}
+                -
+                {{ "%02d"|format((entry.end_time // 60)|int) }}:{{ "%02d"|format((entry.end_time % 60)|int) }}
+            </span>
+            <p>{{ entry.text }}</p>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="plain-text">
+            {{ transcription.text }}
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="card-actions">
+        <button class="btn btn-accent" hx-post="/api/summarize" hx-target="#summary-container"
+            hx-indicator="#loading-overlay" hx-swap="innerHTML">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="16" x2="12" y2="12" />
+                <line x1="12" y1="8" x2="12.01" y2="8" />
+            </svg>
+            Summarize
+        </button>
+        <button class="btn btn-accent" hx-post="/api/meeting-minutes" hx-target="#minutes-container"
+            hx-indicator="#loading-overlay" hx-swap="innerHTML">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+                <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
+                <line x1="9" y1="10" x2="15" y2="10" />
+                <line x1="9" y1="14" x2="15" y2="14" />
+                <line x1="9" y1="18" x2="13" y2="18" />
+            </svg>
+            Extract Meeting Minutes
+        </button>
+    </div>
+</div>
+
+<!-- Summary Container -->
+<div id="summary-container"></div>
+
+<!-- Meeting Minutes Container -->
+<div id="minutes-container"></div>

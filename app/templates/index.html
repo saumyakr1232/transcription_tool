@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Transcription Tool - Upload Video{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">
+            <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                <path d="M2 17l10 5 10-5" />
+                <path d="M2 12l10 5 10-5" />
+            </svg>
+            <h1>Transcription Tool</h1>
+        </div>
+        <p class="tagline">Upload a video and get instant transcription with AI-powered insights</p>
+    </header>
+
+    <!-- Upload Section -->
+    <section class="upload-section">
+        <form id="upload-form" hx-post="/api/upload" hx-target="#results-container" hx-indicator="#loading-overlay"
+            hx-encoding="multipart/form-data" class="upload-form">
+            <div class="upload-area" id="upload-area">
+                <div class="upload-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                        <polyline points="17 8 12 3 7 8" />
+                        <line x1="12" y1="3" x2="12" y2="15" />
+                    </svg>
+                </div>
+                <p class="upload-text">Drag and drop your video here</p>
+                <p class="upload-subtext">or click to browse</p>
+                <input type="file" name="file" id="file-input" accept=".mp4,.avi,.mov,.mkv,.webm,.m4v" required>
+                <div class="selected-file" id="selected-file"></div>
+            </div>
+
+            <!-- Options -->
+            <div class="upload-options">
+                <label class="toggle-label">
+                    <input type="checkbox" name="include_timestamps" value="true" checked>
+                    <span class="toggle-switch"></span>
+                    <span class="toggle-text">Include timestamps</span>
+                </label>
+            </div>
+
+            <button type="submit" class="btn btn-primary" id="upload-btn" disabled>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="17 8 12 3 7 8" />
+                    <line x1="12" y1="3" x2="12" y2="15" />
+                </svg>
+                Upload & Transcribe
+            </button>
+        </form>
+    </section>
+
+    <!-- Results Section -->
+    <section class="results-section" id="results-section">
+        <div id="results-container">
+            <!-- Transcription will be loaded here -->
+        </div>
+    </section>
+</div>
+{% endblock %}
