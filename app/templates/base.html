@@ -64,13 +64,12 @@
         {% block content %}{% endblock %}
     </main>
 
-    <!-- Footer -->
-    <footer
-        class="fixed bottom-0 left-0 right-0 px-6 py-3 liquid-glass-footer text-sm text-gray-600 dark:text-gray-400">
+    <!-- Footer - Cognizant Navy Blue Theme -->
+    <footer class="fixed bottom-0 left-0 right-0 px-6 py-3 liquid-glass-footer text-sm">
         <div class="max-w-4xl mx-auto flex justify-between items-center">
             <span>© 2026 Transcription Tool. All rights reserved.</span>
             <span id="uploads-size" hx-get="/api/uploads-size" hx-trigger="load, every 30s" hx-swap="innerHTML">
-                <span class="text-gray-400">Uploads: --</span>
+                <span class="opacity-75">Uploads: --</span>
             </span>
         </div>
     </footer>

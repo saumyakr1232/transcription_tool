@@ -15,7 +15,7 @@ from app.core.session import (
     cleanup_session,
     get_session_file_prefix,
 )
-from app.models.schemas import ErrorResponse, TranscriptionResponse
+from app.models.schemas import TranscriptionResponse
 from app.services.transcription import (
     transcribe_video,
     summarize_text,
