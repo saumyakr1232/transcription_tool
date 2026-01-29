@@ -155,11 +155,11 @@
 .liquid-glass-input:hover,
 .liquid-glass-input:focus-within,
 .liquid-glass-input.dragover {
-    border-color: rgba(38, 239, 233, 0.6);
+    border-color: rgba(47, 120, 196, 0.6);
     box-shadow:
-        0 8px 32px rgba(38, 239, 233, 0.15),
+        0 8px 32px rgba(47, 120, 196, 0.2),
         inset 0 1px 3px rgba(255, 255, 255, 0.5),
-        0 0 0 4px rgba(38, 239, 233, 0.1);
+        0 0 0 4px rgba(47, 120, 196, 0.15);
     transform: translateY(-2px);
 }
 
@@ -178,11 +178,11 @@
 .dark .liquid-glass-input:hover,
 .dark .liquid-glass-input:focus-within,
 .dark .liquid-glass-input.dragover {
-    border-color: rgba(38, 239, 233, 0.5);
+    border-color: rgba(47, 120, 196, 0.6);
     box-shadow:
-        0 8px 32px rgba(38, 239, 233, 0.2),
+        0 8px 32px rgba(47, 120, 196, 0.25),
         inset 0 1px 2px rgba(255, 255, 255, 0.05),
-        0 0 0 4px rgba(38, 239, 233, 0.1);
+        0 0 0 4px rgba(47, 120, 196, 0.15);
 }
 
 /* Liquid glass button */
@@ -271,21 +271,22 @@
         inset 0 1px 0 rgba(38, 239, 233, 0.08);
 }
 
-/* Accent button with liquid glass */
+/* Primary button with liquid glass - Cognizant Blue */
 .liquid-accent-btn {
     position: relative;
     background: linear-gradient(
         145deg,
-        rgba(38, 239, 233, 0.9) 0%,
-        rgba(38, 239, 233, 0.7) 100%
+        #2F78C4 0%,
+        #1E5A9E 100%
     );
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 16px;
     box-shadow:
-        0 4px 20px rgba(38, 239, 233, 0.3),
-        inset 0 1px 2px rgba(255, 255, 255, 0.4);
+        0 4px 20px rgba(47, 120, 196, 0.35),
+        inset 0 1px 2px rgba(255, 255, 255, 0.3);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     overflow: hidden;
+    color: white;
 }
 
 .liquid-accent-btn::before {
@@ -297,7 +298,7 @@
     height: 50%;
     background: linear-gradient(
         180deg,
-        rgba(255, 255, 255, 0.3) 0%,
+        rgba(255, 255, 255, 0.25) 0%,
         transparent 100%
     );
     pointer-events: none;
@@ -305,9 +306,14 @@
 
 .liquid-accent-btn:hover:not(:disabled) {
     transform: translateY(-2px) scale(1.02);
+    background: linear-gradient(
+        145deg,
+        #4A90D9 0%,
+        #2F78C4 100%
+    );
     box-shadow:
-        0 8px 30px rgba(38, 239, 233, 0.4),
-        inset 0 1px 2px rgba(255, 255, 255, 0.5);
+        0 8px 30px rgba(47, 120, 196, 0.45),
+        inset 0 1px 2px rgba(255, 255, 255, 0.4);
 }
 
 .liquid-accent-btn:disabled {
@@ -360,7 +366,7 @@
 }
 
 .toast.success {
-    border-color: rgba(38, 239, 233, 0.5);
+    border-color: rgba(47, 120, 196, 0.5);
 }
 
 /* Selected file display */

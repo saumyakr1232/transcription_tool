@@ -19,9 +19,13 @@
             theme: {
                 extend: {
                     colors: {
-                        'primary': '#000048',
+                        'primary': '#2F78C4',
+                        'primary-dark': '#1E5A9E',
+                        'primary-light': '#4A90D9',
                         'accent': '#26EFE9',
                         'accent-hover': '#1ed4cf',
+                        'navy': '#000048',
+                        'navy-dark': '#00002a',
                     },
                     fontFamily: {
                         'sans': ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
@@ -55,7 +59,7 @@
     <!-- Loading Indicator -->
     <div id="loading-overlay"
         class="fixed inset-0 bg-white/95 dark:bg-black/95 flex flex-col items-center justify-center gap-4 z-50 opacity-0 invisible transition-all duration-300 htmx-indicator">
-        <div class="w-12 h-12 border-3 border-gray-200 dark:border-gray-700 border-t-accent rounded-full animate-spin">
+        <div class="w-12 h-12 border-3 border-gray-200 dark:border-gray-700 border-t-primary rounded-full animate-spin">
         </div>
         <span class="text-gray-600 dark:text-gray-400 text-lg">Processing...</span>
     </div>

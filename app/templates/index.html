@@ -43,7 +43,7 @@
         </div>
 
         <div class="flex items-center justify-center gap-3 mb-4">
-            <svg class="w-12 h-12 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg class="w-12 h-12 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M12 2L2 7l10 5 10-5-10-5z" />
                 <path d="M2 17l10 5 10-5" />
                 <path d="M2 12l10 5 10-5" />
@@ -60,7 +60,7 @@
             hx-encoding="multipart/form-data" class="flex flex-col gap-6">
             <div class="upload-area liquid-glass-input relative p-12 text-center cursor-pointer" id="upload-area">
                 <div class="mb-4">
-                    <svg class="w-16 h-16 mx-auto text-accent opacity-80" viewBox="0 0 24 24" fill="none"
+                    <svg class="w-16 h-16 mx-auto text-primary opacity-80" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" stroke-width="2">
                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                         <polyline points="17 8 12 3 7 8" />
@@ -71,7 +71,8 @@
                 <p class="text-gray-500 dark:text-gray-500 text-sm">or click to browse</p>
                 <input type="file" name="file" id="file-input" accept=".mp4,.avi,.mov,.mkv,.webm,.m4v" required
                     class="absolute inset-0 opacity-0 cursor-pointer">
-                <div class="mt-4 px-4 py-2 bg-accent/10 rounded-lg text-accent text-sm hidden" id="selected-file"></div>
+                <div class="mt-4 px-4 py-2 bg-primary/10 rounded-lg text-primary text-sm hidden" id="selected-file">
+                </div>
             </div>
 
             <!-- Options -->
@@ -80,7 +81,7 @@
                     <div class="relative">
                         <input type="checkbox" name="include_timestamps" value="true" checked class="sr-only peer">
                         <div
-                            class="w-11 h-6 bg-gray-200 dark:bg-gray-800 rounded-full peer-checked:bg-accent transition-all duration-300">
+                            class="w-11 h-6 bg-gray-200 dark:bg-gray-800 rounded-full peer-checked:bg-primary transition-all duration-300">
                         </div>
                         <div
                             class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full peer-checked:translate-x-5 transition-all duration-300 shadow">
@@ -91,7 +92,7 @@
             </div>
 
             <button type="submit"
-                class="liquid-accent-btn flex items-center justify-center gap-2 px-8 py-4 text-primary font-semibold"
+                class="liquid-accent-btn flex items-center justify-center gap-2 px-8 py-4 text-white font-semibold"
                 id="upload-btn" disabled>
                 <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
