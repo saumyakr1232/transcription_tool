@@ -216,3 +216,34 @@ async def download_transcription() -> FileResponse:
     return FileResponse(
         path=download_path, filename="transcription.txt", media_type="text/plain"
     )
+
+
+@router.get("/uploads-size")
+async def get_uploads_size() -> HTMLResponse:
+    """Get the current size of the uploads folder.
+
+    Returns:
+        HTMLResponse with formatted size.
+    """
+    total_size = 0
+    try:
+        if settings.UPLOADS_DIR.exists():
+            for file in settings.UPLOADS_DIR.iterdir():
+                if file.is_file():
+                    total_size += file.stat().st_size
+    except Exception as e:
+        logger.error(f"Failed to calculate uploads size: {e}")
+
+    # Format size
+    if total_size == 0:
+        formatted = "0 B"
+    elif total_size < 1024:
+        formatted = f"{total_size} B"
+    elif total_size < 1024 * 1024:
+        formatted = f"{total_size / 1024:.1f} KB"
+    elif total_size < 1024 * 1024 * 1024:
+        formatted = f"{total_size / (1024 * 1024):.1f} MB"
+    else:
+        formatted = f"{total_size / (1024 * 1024 * 1024):.2f} GB"
+
+    return HTMLResponse(f"Uploads: {formatted}")
