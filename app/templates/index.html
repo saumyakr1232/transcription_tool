@@ -3,49 +3,88 @@
 {% block title %}Transcription Tool - Upload Video{% endblock %}
 
 {% block content %}
-<div class="container">
-    <!-- Header -->
-    <header class="header">
-        <div class="logo">
-            <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+<div class="max-w-4xl mx-auto px-6 py-12">
+    <!-- Header with Theme Toggle -->
+    <header class="text-center mb-12">
+        <!-- Theme Toggle Button -->
+        <div class="flex justify-end mb-6">
+            <button id="theme-toggle" onclick="toggleTheme()"
+                class="p-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                title="Toggle theme">
+                <!-- Sun icon (shown in dark mode) -->
+                <svg class="w-5 h-5 hidden dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2">
+                    <circle cx="12" cy="12" r="5" />
+                    <line x1="12" y1="1" x2="12" y2="3" />
+                    <line x1="12" y1="21" x2="12" y2="23" />
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                    <line x1="1" y1="12" x2="3" y2="12" />
+                    <line x1="21" y1="12" x2="23" y2="12" />
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+                </svg>
+                <!-- Moon icon (shown in light mode) -->
+                <svg class="w-5 h-5 block dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                </svg>
+            </button>
+        </div>
+
+        <div class="flex items-center justify-center gap-3 mb-4">
+            <svg class="w-12 h-12 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M12 2L2 7l10 5 10-5-10-5z" />
                 <path d="M2 17l10 5 10-5" />
                 <path d="M2 12l10 5 10-5" />
             </svg>
-            <h1>Transcription Tool</h1>
+            <h1 class="text-4xl font-bold text-gray-900 dark:text-white">Transcription Tool</h1>
         </div>
-        <p class="tagline">Upload a video and get instant transcription with AI-powered insights</p>
+        <p class="text-gray-600 dark:text-gray-400 text-lg">Upload a video and get instant transcription with AI-powered
+            insights</p>
     </header>
 
     <!-- Upload Section -->
-    <section class="upload-section">
+    <section class="mb-12">
         <form id="upload-form" hx-post="/api/upload" hx-target="#results-container" hx-indicator="#loading-overlay"
-            hx-encoding="multipart/form-data" class="upload-form">
-            <div class="upload-area" id="upload-area">
-                <div class="upload-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            hx-encoding="multipart/form-data" class="flex flex-col gap-6">
+            <div class="upload-area relative border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-12 text-center bg-white dark:bg-gray-800 hover:border-accent hover:bg-gray-50 dark:hover:bg-gray-750 transition-all duration-300 cursor-pointer"
+                id="upload-area">
+                <div class="mb-4">
+                    <svg class="w-16 h-16 mx-auto text-accent opacity-80" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2">
                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                         <polyline points="17 8 12 3 7 8" />
                         <line x1="12" y1="3" x2="12" y2="15" />
                     </svg>
                 </div>
-                <p class="upload-text">Drag and drop your video here</p>
-                <p class="upload-subtext">or click to browse</p>
-                <input type="file" name="file" id="file-input" accept=".mp4,.avi,.mov,.mkv,.webm,.m4v" required>
-                <div class="selected-file" id="selected-file"></div>
+                <p class="text-lg font-medium text-gray-900 dark:text-white mb-1">Drag and drop your video here</p>
+                <p class="text-gray-500 dark:text-gray-500 text-sm">or click to browse</p>
+                <input type="file" name="file" id="file-input" accept=".mp4,.avi,.mov,.mkv,.webm,.m4v" required
+                    class="absolute inset-0 opacity-0 cursor-pointer">
+                <div class="mt-4 px-4 py-2 bg-accent/10 rounded-lg text-accent text-sm hidden" id="selected-file"></div>
             </div>
 
             <!-- Options -->
-            <div class="upload-options">
-                <label class="toggle-label">
-                    <input type="checkbox" name="include_timestamps" value="true" checked>
-                    <span class="toggle-switch"></span>
-                    <span class="toggle-text">Include timestamps</span>
+            <div class="flex justify-center">
+                <label class="flex items-center gap-3 cursor-pointer select-none">
+                    <div class="relative">
+                        <input type="checkbox" name="include_timestamps" value="true" checked class="sr-only peer">
+                        <div
+                            class="w-11 h-6 bg-gray-200 dark:bg-gray-700 rounded-full peer-checked:bg-accent transition-all duration-300">
+                        </div>
+                        <div
+                            class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full peer-checked:translate-x-5 transition-all duration-300 shadow">
+                        </div>
+                    </div>
+                    <span class="text-gray-600 dark:text-gray-400 text-sm">Include timestamps</span>
                 </label>
             </div>
 
-            <button type="submit" class="btn btn-primary" id="upload-btn" disabled>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <button type="submit"
+                class="flex items-center justify-center gap-2 px-8 py-4 bg-primary text-white font-semibold rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
+                id="upload-btn" disabled>
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                     <polyline points="17 8 12 3 7 8" />
                     <line x1="12" y1="3" x2="12" y2="15" />

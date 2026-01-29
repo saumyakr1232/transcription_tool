@@ -1,27 +1,32 @@
 <!-- Meeting Minutes Result Partial -->
-<div class="result-card minutes-card">
-    <div class="card-header">
-        <h2>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+<div
+    class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden mb-6 animate-fade-in shadow-sm">
+    <div
+        class="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+        <h2 class="flex items-center gap-2 text-lg font-semibold text-gray-900 dark:text-white">
+            <svg class="w-6 h-6 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
                 <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
             </svg>
             Meeting Minutes
         </h2>
-        <button class="btn btn-ghost btn-sm" onclick="copyMinutes()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <button
+            class="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all"
+            onclick="copyMinutes()">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
                 <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
             </svg>
         </button>
     </div>
 
-    <div class="card-content minutes-content" id="minutes-text">
+    <div class="p-6 space-y-6" id="minutes-text">
         <!-- Attendees -->
         {% if minutes.attendees %}
-        <div class="minutes-section">
-            <h3>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <div>
+            <h3
+                class="flex items-center gap-2 text-base font-semibold text-gray-900 dark:text-white mb-3 pb-2 border-b border-gray-200 dark:border-gray-700">
+                <svg class="w-5 h-5 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
                     <circle cx="9" cy="7" r="4" />
                     <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
@@ -29,19 +34,22 @@
                 </svg>
                 Attendees
             </h3>
-            <ul class="attendees-list">
+            <div class="flex flex-wrap gap-2">
                 {% for attendee in minutes.attendees %}
-                <li>{{ attendee }}</li>
+                <span
+                    class="px-3 py-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-sm rounded-md">{{
+                    attendee }}</span>
                 {% endfor %}
-            </ul>
+            </div>
         </div>
         {% endif %}
 
         <!-- Agenda Items -->
         {% if minutes.agenda_items %}
-        <div class="minutes-section">
-            <h3>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <div>
+            <h3
+                class="flex items-center gap-2 text-base font-semibold text-gray-900 dark:text-white mb-3 pb-2 border-b border-gray-200 dark:border-gray-700">
+                <svg class="w-5 h-5 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <line x1="8" y1="6" x2="21" y2="6" />
                     <line x1="8" y1="12" x2="21" y2="12" />
                     <line x1="8" y1="18" x2="21" y2="18" />
@@ -51,32 +59,35 @@
                 </svg>
                 Agenda Items
             </h3>
-            <ul class="agenda-list">
+            <div class="space-y-2">
                 {% for item in minutes.agenda_items %}
-                <li>{{ item }}</li>
+                <div
+                    class="px-4 py-2 bg-gray-100 dark:bg-gray-700/50 text-gray-700 dark:text-gray-300 text-sm rounded-md border-l-3 border-accent">
+                    {{ item }}</div>
                 {% endfor %}
-            </ul>
+            </div>
         </div>
         {% endif %}
 
         <!-- Action Items -->
         {% if minutes.action_items %}
-        <div class="minutes-section">
-            <h3>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <div>
+            <h3
+                class="flex items-center gap-2 text-base font-semibold text-gray-900 dark:text-white mb-3 pb-2 border-b border-gray-200 dark:border-gray-700">
+                <svg class="w-5 h-5 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <polyline points="9 11 12 14 22 4" />
                     <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
                 </svg>
                 Action Items
             </h3>
-            <div class="action-items">
+            <div class="space-y-3">
                 {% for action in minutes.action_items %}
-                <div class="action-item">
-                    <div class="action-task">{{ action.task }}</div>
-                    <div class="action-meta">
+                <div class="p-4 bg-gray-100 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600">
+                    <div class="text-gray-900 dark:text-white font-medium mb-2">{{ action.task }}</div>
+                    <div class="flex gap-6 text-sm">
                         {% if action.assignee %}
-                        <span class="action-assignee">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <span class="flex items-center gap-1 text-gray-500 dark:text-gray-400">
+                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
                                 <circle cx="12" cy="7" r="4" />
                             </svg>
@@ -84,8 +95,8 @@
                         </span>
                         {% endif %}
                         {% if action.due_date %}
-                        <span class="action-due">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <span class="flex items-center gap-1 text-gray-500 dark:text-gray-400">
+                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
                                 <line x1="16" y1="2" x2="16" y2="6" />
                                 <line x1="8" y1="2" x2="8" y2="6" />
@@ -103,19 +114,22 @@
 
         <!-- Decisions -->
         {% if minutes.decisions %}
-        <div class="minutes-section">
-            <h3>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <div>
+            <h3
+                class="flex items-center gap-2 text-base font-semibold text-gray-900 dark:text-white mb-3 pb-2 border-b border-gray-200 dark:border-gray-700">
+                <svg class="w-5 h-5 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
                     <polyline points="22 4 12 14.01 9 11.01" />
                 </svg>
                 Key Decisions
             </h3>
-            <ul class="decisions-list">
+            <div class="space-y-2">
                 {% for decision in minutes.decisions %}
-                <li>{{ decision }}</li>
+                <div
+                    class="px-4 py-2 bg-gray-100 dark:bg-gray-700/50 text-gray-700 dark:text-gray-300 text-sm rounded-md border-l-3 border-accent">
+                    {{ decision }}</div>
                 {% endfor %}
-            </ul>
+            </div>
         </div>
         {% endif %}
     </div>

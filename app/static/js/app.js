@@ -2,6 +2,35 @@
  * Transcription Tool - Client-side JavaScript
  */
 
+// Theme Management
+function toggleTheme() {
+    const html = document.documentElement;
+    const isDark = html.classList.contains('dark');
+    
+    if (isDark) {
+        html.classList.remove('dark');
+        html.classList.add('light');
+        localStorage.setItem('theme', 'light');
+    } else {
+        html.classList.remove('light');
+        html.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+    }
+}
+
+// Listen for system theme changes
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+    if (!localStorage.getItem('theme')) {
+        if (e.matches) {
+            document.documentElement.classList.remove('light');
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+            document.documentElement.classList.add('light');
+        }
+    }
+});
+
 // DOM Elements
 const uploadArea = document.getElementById('upload-area');
 const fileInput = document.getElementById('file-input');
@@ -51,6 +80,7 @@ if (uploadArea && fileInput) {
     function handleFileSelect(file) {
         if (file) {
             selectedFile.textContent = `Selected: ${file.name} (${formatFileSize(file.size)})`;
+            selectedFile.classList.remove('hidden');
             selectedFile.classList.add('show');
             uploadBtn.disabled = false;
         }

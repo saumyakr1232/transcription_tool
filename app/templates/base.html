@@ -1,34 +1,71 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="light">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Transcription Tool{% endblock %}</title>
-    <meta name="description" content="Upload videos and get instant transcriptions with summarization and meeting minutes extraction">
-    
+    <meta name="description"
+        content="Upload videos and get instant transcriptions with summarization and meeting minutes extraction">
+
     <!-- HTMX -->
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
-    
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        'primary': '#000048',
+                        'accent': '#26EFE9',
+                        'accent-hover': '#1ed4cf',
+                    },
+                    fontFamily: {
+                        'sans': ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Theme Detection Script (runs early to prevent flash) -->
+    <script>
+            (function () {
+                const savedTheme = localStorage.getItem('theme');
+                if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                    document.documentElement.classList.remove('light');
+                    document.documentElement.classList.add('dark');
+                }
+            })();
+    </script>
+
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Styles -->
+
+    <!-- Custom Styles -->
     <link rel="stylesheet" href="/static/css/styles.css">
 </head>
-<body>
+
+<body class="bg-gray-50 dark:bg-gray-900 min-h-screen font-sans transition-colors duration-300">
     <!-- Loading Indicator -->
-    <div id="loading-overlay" class="htmx-indicator">
-        <div class="spinner"></div>
-        <span>Processing...</span>
+    <div id="loading-overlay"
+        class="fixed inset-0 bg-white/95 dark:bg-gray-900/95 flex flex-col items-center justify-center gap-4 z-50 opacity-0 invisible transition-all duration-300 htmx-indicator">
+        <div class="w-12 h-12 border-3 border-gray-200 dark:border-gray-700 border-t-accent rounded-full animate-spin">
+        </div>
+        <span class="text-gray-600 dark:text-gray-400 text-lg">Processing...</span>
     </div>
-    
+
     <main>
         {% block content %}{% endblock %}
     </main>
-    
+
     <!-- Scripts -->
     <script src="/static/js/app.js"></script>
 </body>
+
 </html>

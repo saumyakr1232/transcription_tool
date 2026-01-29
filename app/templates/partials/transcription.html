@@ -1,8 +1,10 @@
 <!-- Transcription Result Partial -->
-<div class="result-card transcription-card">
-    <div class="card-header">
-        <h2>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+<div
+    class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden mb-6 animate-fade-in shadow-sm">
+    <div
+        class="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+        <h2 class="flex items-center gap-2 text-lg font-semibold text-gray-900 dark:text-white">
+            <svg class="w-6 h-6 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
                 <polyline points="14 2 14 8 20 8" />
                 <line x1="16" y1="13" x2="8" y2="13" />
@@ -11,31 +13,42 @@
             </svg>
             Transcription
         </h2>
-        <span class="badge">{{ transcription.video_filename }}</span>
+        <span class="px-3 py-1 bg-accent/15 text-primary dark:text-accent text-xs font-medium rounded-md">{{
+            transcription.video_filename }}</span>
     </div>
 
     <!-- Controls -->
-    <div class="card-controls">
-        <div class="control-group">
-            <label class="toggle-label">
+    <div
+        class="flex items-center justify-between px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/30">
+        <label class="flex items-center gap-3 cursor-pointer select-none">
+            <div class="relative">
                 <input type="checkbox" id="timestamps-toggle" {% if include_timestamps %}checked{% endif %}
                     hx-post="/api/transcribe" hx-target="#results-container" hx-indicator="#loading-overlay"
-                    hx-vals='js:{include_timestamps: event.target.checked}'>
-                <span class="toggle-switch"></span>
-                <span class="toggle-text">Show timestamps</span>
-            </label>
-        </div>
+                    hx-vals='js:{include_timestamps: event.target.checked}' class="sr-only peer">
+                <div
+                    class="w-11 h-6 bg-gray-200 dark:bg-gray-700 rounded-full peer-checked:bg-accent transition-all duration-300">
+                </div>
+                <div
+                    class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full peer-checked:translate-x-5 transition-all duration-300 shadow">
+                </div>
+            </div>
+            <span class="text-gray-600 dark:text-gray-400 text-sm">Show timestamps</span>
+        </label>
 
-        <div class="btn-group">
-            <button class="btn btn-secondary btn-sm" onclick="copyTranscription()">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <div class="flex gap-2">
+            <button
+                class="flex items-center gap-2 px-3 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-all"
+                onclick="copyTranscription()">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
                     <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
                 </svg>
                 Copy
             </button>
-            <a href="/api/download" class="btn btn-secondary btn-sm" download>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <a href="/api/download"
+                class="flex items-center gap-2 px-3 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-all"
+                download>
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                     <polyline points="7 10 12 15 17 10" />
                     <line x1="12" y1="15" x2="12" y2="3" />
@@ -46,39 +59,41 @@
     </div>
 
     <!-- Transcription Content -->
-    <div class="card-content transcription-content" id="transcription-text">
+    <div class="p-6 max-h-96 overflow-y-auto" id="transcription-text">
         {% if include_timestamps and transcription.timestamps %}
         {% for entry in transcription.timestamps %}
-        <div class="timestamp-entry">
-            <span class="timestamp">
+        <div class="mb-6 pl-4 border-l-2 border-accent">
+            <span
+                class="inline-block px-2 py-1 bg-accent/10 text-primary dark:text-accent text-xs font-mono rounded mb-2">
                 {{ "%02d"|format((entry.start_time // 60)|int) }}:{{ "%02d"|format((entry.start_time % 60)|int) }}
                 -
                 {{ "%02d"|format((entry.end_time // 60)|int) }}:{{ "%02d"|format((entry.end_time % 60)|int) }}
             </span>
-            <p>{{ entry.text }}</p>
+            <p class="text-gray-700 dark:text-gray-300 leading-relaxed">{{ entry.text }}</p>
         </div>
         {% endfor %}
         {% else %}
-        <div class="plain-text">
-            {{ transcription.text }}
-        </div>
+        <div class="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap">{{ transcription.text }}</div>
         {% endif %}
     </div>
 
     <!-- Action Buttons -->
-    <div class="card-actions">
-        <button class="btn btn-accent" hx-post="/api/summarize" hx-target="#summary-container"
-            hx-indicator="#loading-overlay" hx-swap="innerHTML">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <div class="flex gap-4 p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/30">
+        <button
+            class="flex items-center gap-2 px-4 py-3 bg-primary/10 text-primary border border-primary/30 rounded-lg hover:bg-primary/20 transition-all"
+            hx-post="/api/summarize" hx-target="#summary-container" hx-indicator="#loading-overlay" hx-swap="innerHTML">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <circle cx="12" cy="12" r="10" />
                 <line x1="12" y1="16" x2="12" y2="12" />
                 <line x1="12" y1="8" x2="12.01" y2="8" />
             </svg>
             Summarize
         </button>
-        <button class="btn btn-accent" hx-post="/api/meeting-minutes" hx-target="#minutes-container"
-            hx-indicator="#loading-overlay" hx-swap="innerHTML">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <button
+            class="flex items-center gap-2 px-4 py-3 bg-primary/10 text-primary border border-primary/30 rounded-lg hover:bg-primary/20 transition-all"
+            hx-post="/api/meeting-minutes" hx-target="#minutes-container" hx-indicator="#loading-overlay"
+            hx-swap="innerHTML">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
                 <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
                 <line x1="9" y1="10" x2="15" y2="10" />

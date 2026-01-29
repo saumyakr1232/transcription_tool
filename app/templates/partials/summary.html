@@ -1,23 +1,26 @@
 <!-- Summary Result Partial -->
-<div class="result-card summary-card">
-    <div class="card-header">
-        <h2>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+<div
+    class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden mb-6 animate-fade-in shadow-sm">
+    <div
+        class="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+        <h2 class="flex items-center gap-2 text-lg font-semibold text-gray-900 dark:text-white">
+            <svg class="w-6 h-6 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <circle cx="12" cy="12" r="10" />
                 <line x1="12" y1="16" x2="12" y2="12" />
                 <line x1="12" y1="8" x2="12.01" y2="8" />
             </svg>
             Summary
         </h2>
-        <button class="btn btn-ghost btn-sm" onclick="copySummary()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <button
+            class="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all"
+            onclick="copySummary()">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
                 <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
             </svg>
         </button>
     </div>
 
-    <div class="card-content summary-content" id="summary-text">
-        {{ summary.summary | safe }}
-    </div>
+    <div class="p-6 text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap" id="summary-text">{{
+        summary.summary | safe }}</div>
 </div>
