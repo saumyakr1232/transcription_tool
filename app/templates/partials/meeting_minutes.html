@@ -1,8 +1,8 @@
 <!-- Meeting Minutes Result Partial -->
 <div
-    class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden mb-6 animate-fade-in shadow-sm">
+    class="bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden mb-6 animate-fade-in shadow-sm">
     <div
-        class="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+        class="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
         <h2 class="flex items-center gap-2 text-lg font-semibold text-gray-900 dark:text-white">
             <svg class="w-6 h-6 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
@@ -62,7 +62,7 @@
             <div class="space-y-2">
                 {% for item in minutes.agenda_items %}
                 <div
-                    class="px-4 py-2 bg-gray-100 dark:bg-gray-700/50 text-gray-700 dark:text-gray-300 text-sm rounded-md border-l-3 border-accent">
+                    class="px-4 py-2 bg-gray-100 dark:bg-gray-900/50 text-gray-700 dark:text-gray-300 text-sm rounded-md border-l-3 border-accent">
                     {{ item }}</div>
                 {% endfor %}
             </div>
@@ -82,7 +82,7 @@
             </h3>
             <div class="space-y-3">
                 {% for action in minutes.action_items %}
-                <div class="p-4 bg-gray-100 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600">
+                <div class="p-4 bg-gray-100 dark:bg-gray-900/50 rounded-lg border border-gray-200 dark:border-gray-600">
                     <div class="text-gray-900 dark:text-white font-medium mb-2">{{ action.task }}</div>
                     <div class="flex gap-6 text-sm">
                         {% if action.assignee %}
