@@ -37,6 +37,10 @@ class Settings:
         ".m4v",
     }
 
+    # Session settings
+    SESSION_COOKIE_NAME: str = "transcription_session"
+    SESSION_MAX_AGE: int = 86400  # 24 hours in seconds
+
     def __init__(self) -> None:
         """Ensure required directories exist."""
         self.UPLOADS_DIR.mkdir(parents=True, exist_ok=True)

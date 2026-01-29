@@ -193,3 +193,64 @@ document.body.addEventListener('htmx:responseError', (event) => {
         showToast('An error occurred', 'error');
     }
 });
+
+/**
+ * End the current session and clean up all files
+ */
+async function endSession() {
+    if (!confirm('End your session? This will delete all uploaded files and transcriptions.')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch('/api/session/end', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Clear results area
+            const resultsContainer = document.getElementById('results-container');
+            if (resultsContainer) {
+                resultsContainer.innerHTML = '';
+            }
+            
+            // Reset file input
+            const fileInput = document.getElementById('file-input');
+            if (fileInput) {
+                fileInput.value = '';
+            }
+            
+            // Hide selected file indicator
+            const selectedFile = document.getElementById('selected-file');
+            if (selectedFile) {
+                selectedFile.classList.add('hidden');
+                selectedFile.classList.remove('show');
+            }
+            
+            // Disable upload button
+            const uploadBtn = document.getElementById('upload-btn');
+            if (uploadBtn) {
+                uploadBtn.disabled = true;
+            }
+            
+            // Refresh uploads size
+            htmx.trigger('#uploads-size', 'load');
+            
+            const message = data.files_deleted > 0 
+                ? `Session ended. ${data.files_deleted} file(s) cleaned up.`
+                : 'Session ended.';
+            showToast(message, 'success');
+        } else {
+            showToast('Failed to end session', 'error');
+        }
+    } catch (err) {
+        console.error('Failed to end session:', err);
+        showToast('Failed to end session', 'error');
+    }
+}
+
