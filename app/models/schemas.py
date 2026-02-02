@@ -1,5 +1,6 @@
 """Pydantic data models for request/response validation."""
 
+from enum import Enum
 from pydantic import BaseModel, Field
 
 
@@ -84,3 +85,34 @@ class ErrorResponse(BaseModel):
 
     error: str = Field(..., description="Error message")
     detail: str | None = Field(default=None, description="Additional error details")
+
+
+class JobStatus(str, Enum):
+    """Status of a transcription job."""
+
+    QUEUED = "queued"
+    LOADING_MODEL = "loading_model"
+    CONVERTING = "converting"
+    TRANSCRIBING = "transcribing"
+    COMPLETED = "completed"
+    FAILED = "failed"
+
+
+class JobProgress(BaseModel):
+    """Progress update for a transcription job."""
+
+    job_id: str = Field(..., description="Unique job identifier")
+    status: JobStatus = Field(..., description="Current job status")
+    progress: int = Field(default=0, description="Progress percentage 0-100")
+    message: str = Field(default="", description="Human-readable progress message")
+    result: TranscriptionResponse | None = Field(
+        default=None, description="Transcription result when completed"
+    )
+    error: str | None = Field(default=None, description="Error message if failed")
+
+
+class JobSubmitResponse(BaseModel):
+    """Response when a transcription job is submitted."""
+
+    job_id: str = Field(..., description="Unique job identifier")
+    message: str = Field(default="Job submitted", description="Status message")

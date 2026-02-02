@@ -9,6 +9,7 @@ from fastapi.responses import JSONResponse
 from app.core.config import settings
 from app.core.logging import logger, get_logger
 from app.core.session import cleanup_stale_sessions
+from app.services.job_manager import shutdown_executor
 from app.routers import api, pages
 
 app_logger = get_logger("main")
@@ -21,6 +22,9 @@ async def lifespan(app: FastAPI):
     logger.info(f"Environment: {settings.ENVIRONMENT}")
     logger.info(f"Debug mode: {settings.DEBUG}")
     yield
+    # Shutdown worker pool
+    logger.info("Shutting down worker pool...")
+    shutdown_executor()
     # Cleanup all sessions on shutdown
     logger.info("Cleaning up sessions...")
     cleanup_stale_sessions(max_age_seconds=0)  # Clean all sessions

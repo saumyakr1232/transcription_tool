@@ -56,8 +56,7 @@
 
     <!-- Upload Section -->
     <section class="mb-12">
-        <form id="upload-form" hx-post="/api/upload" hx-target="#results-container" hx-indicator="#loading-overlay"
-            hx-encoding="multipart/form-data" class="flex flex-col gap-6">
+        <form id="upload-form" class="flex flex-col gap-6" onsubmit="submitUpload(event)">
             <div class="upload-area liquid-glass-input relative p-12 text-center cursor-pointer" id="upload-area">
                 <div class="mb-4">
                     <svg class="w-16 h-16 mx-auto text-primary opacity-80" viewBox="0 0 24 24" fill="none"
@@ -86,6 +85,72 @@
                 Upload & Transcribe
             </button>
         </form>
+    </section>
+
+    <!-- Progress Section (hidden initially) -->
+    <section id="progress-section" class="mb-12 hidden">
+        <div class="liquid-glass p-8 animate-fade-in">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-8 h-8 border-3 border-gray-200 dark:border-gray-700 border-t-primary rounded-full animate-spin"></div>
+                <h2 class="text-lg font-semibold text-gray-900 dark:text-white" id="progress-title">Processing...</h2>
+            </div>
+
+            <!-- Progress bar -->
+            <div class="w-full bg-gray-200 dark:bg-gray-800 rounded-full h-3 mb-4 overflow-hidden">
+                <div id="progress-bar"
+                    class="h-3 rounded-full bg-gradient-to-r from-primary to-accent transition-all duration-500 ease-out"
+                    style="width: 0%"></div>
+            </div>
+
+            <!-- Progress info -->
+            <div class="flex items-center justify-between">
+                <p class="text-gray-600 dark:text-gray-400 text-sm" id="progress-message">Uploading file...</p>
+                <span class="text-primary font-mono text-sm font-semibold" id="progress-percent">0%</span>
+            </div>
+
+            <!-- Step indicators -->
+            <div class="mt-6 grid grid-cols-4 gap-2">
+                <div class="step-indicator flex flex-col items-center gap-2" id="step-queued">
+                    <div class="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-800 flex items-center justify-center transition-colors">
+                        <svg class="w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <polyline points="12 6 12 12 16 14"/>
+                        </svg>
+                    </div>
+                    <span class="text-xs text-gray-500 dark:text-gray-500 text-center">Queued</span>
+                </div>
+                <div class="step-indicator flex flex-col items-center gap-2" id="step-loading_model">
+                    <div class="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-800 flex items-center justify-center transition-colors">
+                        <svg class="w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                            <path d="M2 17l10 5 10-5"/>
+                            <path d="M2 12l10 5 10-5"/>
+                        </svg>
+                    </div>
+                    <span class="text-xs text-gray-500 dark:text-gray-500 text-center">Loading Model</span>
+                </div>
+                <div class="step-indicator flex flex-col items-center gap-2" id="step-converting">
+                    <div class="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-800 flex items-center justify-center transition-colors">
+                        <svg class="w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polygon points="23 7 16 12 23 17 23 7"/>
+                            <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+                        </svg>
+                    </div>
+                    <span class="text-xs text-gray-500 dark:text-gray-500 text-center">Converting</span>
+                </div>
+                <div class="step-indicator flex flex-col items-center gap-2" id="step-transcribing">
+                    <div class="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-800 flex items-center justify-center transition-colors">
+                        <svg class="w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                            <polyline points="14 2 14 8 20 8"/>
+                            <line x1="16" y1="13" x2="8" y2="13"/>
+                            <line x1="16" y1="17" x2="8" y2="17"/>
+                        </svg>
+                    </div>
+                    <span class="text-xs text-gray-500 dark:text-gray-500 text-center">Transcribing</span>
+                </div>
+            </div>
+        </div>
     </section>
 
     <!-- Results Section -->
