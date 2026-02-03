@@ -8,3 +8,5 @@ uploads/
 .mypy_cache/
 .pytest_cache/
 .ruff_cache/
+*.md
+!README.md
