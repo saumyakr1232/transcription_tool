@@ -1,0 +1,17 @@
+services:
+  web:
+    build: .
+    container_name: transcription_tool
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./uploads:/app/uploads
+    environment:
+      - MAX_UPLOAD_SIZE=500MB
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
