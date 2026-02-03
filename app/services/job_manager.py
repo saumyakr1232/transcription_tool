@@ -43,7 +43,6 @@ def _worker_process(
     queue: multiprocessing.Queue,
 ) -> None:
     """Worker function acting as the transcription process."""
-    # We re-configure logging here if needed, or just rely on queue messages
     try:
         # Helper to send updates
         def send_update(
@@ -54,6 +53,41 @@ def _worker_process(
             e: str | None = None,
         ):
             queue.put((job_id, s, p, m, r, e))
+
+        # --- TQDM Hook ---
+        # We need a way to capture tqdm output from Whisper (or any other lib).
+        # We'll create a custom class and monkeypatch tqdm.tqdm.
+        import tqdm
+
+        class TqdmToQueue(tqdm.tqdm):
+            def __init__(self, *args, **kwargs):
+                super().__init__(*args, **kwargs)
+                # Ensure we don't spam updates; simple throttle could be added here
+
+            def update(self, n=1):
+                super().update(n)
+                # Calculate percentage
+                if self.total:
+                    pct = int((self.n / self.total) * 100)
+                    # We map TQDM progress (0-100) to Job Progress.
+                    # Let's say Transcribing is 50% -> 90% of total job.
+                    # So mapped_pct = 50 + (pct * 0.4)
+                    mapped_pct = 50 + int(pct * 0.4)
+
+                    # Only send update if significant change or sufficient time passed
+                    # For simplicity, sending every update here (Queue is fast enough over IPC for reasonable chunks)
+                    send_update(
+                        JobStatus.TRANSCRIBING, mapped_pct, f"Transcribing: {pct}%"
+                    )
+
+            def close(self):
+                super().close()
+
+        # Apply the patch
+        # Save original just in case (though process is ephemeral)
+        _original_tqdm = tqdm.tqdm
+        tqdm.tqdm = TqdmToQueue
+        # ----------------
 
         # Check for cancellation is implicit: if we are terminated, we stop.
 

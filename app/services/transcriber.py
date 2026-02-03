@@ -46,9 +46,7 @@ class WhisperTranscriber:
         self.model = "mock_model"
         logger.info("Whisper model loaded")
 
-    def transcribe_file(
-        self, file_path: str, language: str | None = None
-    ) -> dict:
+    def transcribe_file(self, file_path: str, language: str | None = None) -> dict:
         """Convert video to WAV via ffmpeg, then transcribe with Whisper.
 
         Args:
@@ -77,11 +75,19 @@ class WhisperTranscriber:
 
         # Step 2: Transcribe with Whisper
         logger.info("Running Whisper transcription...")
+
         # In production:
         #   result = self.model.transcribe(
         #       str(wav_path), language=language, verbose=False
         #   )
-        time.sleep(3.0)  # Simulate transcription time
+
+        # Simulate transcription with progress bars to test the TqdmToQueue hook
+        from tqdm import tqdm
+
+        for _ in tqdm(range(100), desc="Transcribing"):
+            time.sleep(0.03)  # 3 seconds total
+
+        # time.sleep(3.0)  # Old simulation
 
         # Mock result
         full_text = (
@@ -113,17 +119,61 @@ class WhisperTranscriber:
         )
 
         timestamps = [
-            {"start_time": 0.0, "end_time": 8.5, "text": "Welcome everyone to today's quarterly planning meeting. I'm Sarah, and I'll be leading today's discussion."},
-            {"start_time": 8.5, "end_time": 22.0, "text": "First, let's review our Q3 results. We exceeded our revenue targets by 15%, which is a great achievement for the team. John, would you like to share the breakdown?"},
-            {"start_time": 22.0, "end_time": 38.0, "text": "Thanks Sarah. So looking at the numbers, our enterprise segment grew by 22%, while the SMB segment showed steady 8% growth. The new product line we launched in August has been particularly successful."},
-            {"start_time": 38.0, "end_time": 52.0, "text": "That's excellent news. Now let's discuss our Q4 priorities. We need to focus on three main areas: customer retention, product improvements, and expanding into new markets."},
-            {"start_time": 52.0, "end_time": 68.0, "text": "I'd like to propose that we allocate additional resources to the customer success team. Based on our data, improving retention by just 5% would have a significant impact on our bottom line."},
-            {"start_time": 68.0, "end_time": 82.0, "text": "Great point, Maria. Let's make that a priority. John, can you prepare a detailed proposal by next Friday?"},
-            {"start_time": 82.0, "end_time": 86.0, "text": "Absolutely, I'll have that ready."},
-            {"start_time": 86.0, "end_time": 98.0, "text": "Perfect. Let's also discuss the timeline for the new feature release. The engineering team estimates we can have the beta ready by mid-November."},
-            {"start_time": 98.0, "end_time": 108.0, "text": "That works for our marketing timeline. We can coordinate the launch campaign accordingly."},
-            {"start_time": 108.0, "end_time": 128.0, "text": "Excellent. To summarize, our action items are: John will prepare the retention proposal, marketing will draft the launch plan, and we'll reconvene next week to review progress."},
-            {"start_time": 128.0, "end_time": 135.0, "text": "Thanks everyone for your time today. Meeting adjourned."},
+            {
+                "start_time": 0.0,
+                "end_time": 8.5,
+                "text": "Welcome everyone to today's quarterly planning meeting. I'm Sarah, and I'll be leading today's discussion.",
+            },
+            {
+                "start_time": 8.5,
+                "end_time": 22.0,
+                "text": "First, let's review our Q3 results. We exceeded our revenue targets by 15%, which is a great achievement for the team. John, would you like to share the breakdown?",
+            },
+            {
+                "start_time": 22.0,
+                "end_time": 38.0,
+                "text": "Thanks Sarah. So looking at the numbers, our enterprise segment grew by 22%, while the SMB segment showed steady 8% growth. The new product line we launched in August has been particularly successful.",
+            },
+            {
+                "start_time": 38.0,
+                "end_time": 52.0,
+                "text": "That's excellent news. Now let's discuss our Q4 priorities. We need to focus on three main areas: customer retention, product improvements, and expanding into new markets.",
+            },
+            {
+                "start_time": 52.0,
+                "end_time": 68.0,
+                "text": "I'd like to propose that we allocate additional resources to the customer success team. Based on our data, improving retention by just 5% would have a significant impact on our bottom line.",
+            },
+            {
+                "start_time": 68.0,
+                "end_time": 82.0,
+                "text": "Great point, Maria. Let's make that a priority. John, can you prepare a detailed proposal by next Friday?",
+            },
+            {
+                "start_time": 82.0,
+                "end_time": 86.0,
+                "text": "Absolutely, I'll have that ready.",
+            },
+            {
+                "start_time": 86.0,
+                "end_time": 98.0,
+                "text": "Perfect. Let's also discuss the timeline for the new feature release. The engineering team estimates we can have the beta ready by mid-November.",
+            },
+            {
+                "start_time": 98.0,
+                "end_time": 108.0,
+                "text": "That works for our marketing timeline. We can coordinate the launch campaign accordingly.",
+            },
+            {
+                "start_time": 108.0,
+                "end_time": 128.0,
+                "text": "Excellent. To summarize, our action items are: John will prepare the retention proposal, marketing will draft the launch plan, and we'll reconvene next week to review progress.",
+            },
+            {
+                "start_time": 128.0,
+                "end_time": 135.0,
+                "text": "Thanks everyone for your time today. Meeting adjourned.",
+            },
         ]
 
         logger.info("Transcription complete")
