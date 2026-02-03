@@ -1,12 +1,13 @@
 """Job manager for background transcription tasks.
 
-Uses a ThreadPoolExecutor for I/O-bound work (file saving, ffmpeg conversion)
-and delegates CPU/GPU-bound transcription to the WhisperTranscriber.
-Jobs are tracked in-memory with polling-based progress updates for SSE.
+Uses multiprocessing.Process for heavy transcription jobs to support
+cancellation (termination) and isolation.
+Updates are sent back to the main process via a multiprocessing.Queue.
 """
 
+import multiprocessing
+import threading
 import uuid
-from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 from typing import Any
 
@@ -22,8 +23,139 @@ logger = get_logger("services.job_manager")
 # In-memory job store: job_id -> job data
 _jobs: dict[str, dict[str, Any]] = {}
 
-# Worker pool for running transcription in background threads
-_executor = ThreadPoolExecutor(max_workers=2, thread_name_prefix="transcription-worker")
+# Map job_id -> Process object
+_processes: dict[str, multiprocessing.Process] = {}
+
+# Queue for receiving updates from worker processes
+# Message format: (job_id, status, progress, message, result, error)
+_status_queue: multiprocessing.Queue = multiprocessing.Queue()
+
+# Listener thread for the queue
+_listener_thread: threading.Thread | None = None
+_stop_listener = threading.Event()
+
+
+def _worker_process(
+    job_id: str,
+    file_path: str,
+    video_filename: str,
+    language: str | None,
+    queue: multiprocessing.Queue,
+) -> None:
+    """Worker function acting as the transcription process."""
+    # We re-configure logging here if needed, or just rely on queue messages
+    try:
+        # Helper to send updates
+        def send_update(
+            s: JobStatus,
+            p: int,
+            m: str,
+            r: TranscriptionResponse | None = None,
+            e: str | None = None,
+        ):
+            queue.put((job_id, s, p, m, r, e))
+
+        # Check for cancellation is implicit: if we are terminated, we stop.
+
+        # Step 1: Loading model
+        send_update(JobStatus.LOADING_MODEL, 10, "Loading Whisper model...")
+
+        from app.services.transcriber import WhisperTranscriber
+
+        transcriber = WhisperTranscriber()
+        transcriber.load_model()
+
+        # Step 2: Converting audio with ffmpeg
+        send_update(JobStatus.CONVERTING, 30, "Converting audio with ffmpeg...")
+
+        # Step 3: Transcribing
+        send_update(JobStatus.TRANSCRIBING, 50, "Transcribing audio...")
+
+        result = transcriber.transcribe_file(file_path, language=language)
+
+        # Build response
+        transcription = TranscriptionResponse(
+            text=result["text"],
+            timestamps=result.get("timestamps"),
+            video_filename=video_filename,
+        )
+
+        # Step 4: Done
+        send_update(
+            JobStatus.COMPLETED,
+            100,
+            "Transcription complete!",
+            result=transcription,
+        )
+
+        transcriber.cleanup()
+
+    except Exception as e:
+        queue.put(
+            (job_id, JobStatus.FAILED, 0, f"Transcription failed: {e}", None, str(e))
+        )
+
+
+def _start_listener_if_needed():
+    """Start the background thread that consumes the status queue."""
+    global _listener_thread
+    if _listener_thread is None or not _listener_thread.is_alive():
+        _stop_listener.clear()
+        _listener_thread = threading.Thread(
+            target=_status_queue_listener, daemon=True, name="job-manager-listener"
+        )
+        _listener_thread.start()
+        logger.info("Started job manager status listener")
+
+
+def _status_queue_listener():
+    """Runs in a thread in the main process, updating the global _jobs dict."""
+    while not _stop_listener.is_set():
+        try:
+            # Blocking get with timeout to allow checking stop_event
+            msg = _status_queue.get(timeout=1.0)
+            job_id, status, progress, message, result, error = msg
+
+            _update_job_state(job_id, status, progress, message, result, error)
+
+            # If job is done/failed, remove from process map if present
+            if status in (JobStatus.COMPLETED, JobStatus.FAILED):
+                if job_id in _processes:
+                    # process join() is usually good practice, but we do it lazily or explicitly
+                    _processes.pop(job_id, None)
+
+        except multiprocessing.queues.Empty:
+            continue
+        except Exception as e:
+            logger.error(f"Error in status listener: {e}")
+
+
+def _update_job_state(
+    job_id: str,
+    status: JobStatus,
+    progress: int,
+    message: str,
+    result: TranscriptionResponse | None = None,
+    error: str | None = None,
+) -> None:
+    """Internal helper to update the in-memory job store."""
+    job = _jobs.get(job_id)
+    if not job:
+        return
+
+    # If explicitly cancelled by user, we might ignore delayed updates
+    if job["status"] == JobStatus.CANCELLED:
+        return
+
+    job["status"] = status
+    job["progress"] = progress
+    job["message"] = message
+    if result:
+        job["result"] = result
+    if error:
+        job["error"] = error
+    job["_version"] += 1
+    logger.debug(f"Job {job_id}: {status.value} ({progress}%) - {message}")
 
 
 def create_job(
@@ -32,17 +164,7 @@ def create_job(
     video_filename: str,
     language: str | None = None,
 ) -> str:
-    """Create a new transcription job.
-
-    Args:
-        session_id: The session that owns this job.
-        file_path: Path to the uploaded video file.
-        video_filename: Original filename for display.
-        language: Optional language code for transcription.
-
-    Returns:
-        The new job ID.
-    """
+    """Create a new transcription job."""
     job_id = uuid.uuid4().hex[:12]
     _jobs[job_id] = {
         "job_id": job_id,
@@ -62,13 +184,68 @@ def create_job(
     return job_id
 
 
+def submit_job(job_id: str) -> None:
+    """Submit a job to a background process."""
+    job = _jobs.get(job_id)
+    if not job:
+        logger.error(f"Job {job_id} not found")
+        return
+
+    _start_listener_if_needed()
+
+    p = multiprocessing.Process(
+        target=_worker_process,
+        args=(
+            job_id,
+            job["file_path"],
+            job["video_filename"],
+            job["language"],
+            _status_queue,
+        ),
+        daemon=True,
+    )
+    p.start()
+    _processes[job_id] = p
+    logger.info(f"Started worker process for job {job_id} (PID: {p.pid})")
+
+
+def stop_job(job_id: str) -> bool:
+    """Stop a running job by terminating its process."""
+    job = _jobs.get(job_id)
+    if not job:
+        return False
+
+    if job["status"] in (
+        JobStatus.COMPLETED,
+        JobStatus.FAILED,
+        JobStatus.CANCELLED,
+    ):
+        return False
+
+    # Mark as cancelled in state
+    job["status"] = JobStatus.CANCELLED
+    job["message"] = "Job stopped by user"
+    job["_version"] += 1
+
+    # Terminate process if it exists
+    p = _processes.get(job_id)
+    if p and p.is_alive():
+        logger.warning(f"Terminating process {p.pid} for job {job_id}")
+        p.terminate()
+        p.join(timeout=1)
+        if p.is_alive():
+            p.kill()  # Force kill if terminate fails
+        _processes.pop(job_id, None)
+
+    logger.info(f"Job {job_id} stopped by user")
+    return True
+
+
 def get_job(job_id: str) -> dict[str, Any] | None:
-    """Get job data by ID."""
     return _jobs.get(job_id)
 
 
 def get_job_progress(job_id: str) -> JobProgress | None:
-    """Get current job progress as a Pydantic model."""
     job = _jobs.get(job_id)
     if not job:
         return None
@@ -83,109 +260,27 @@ def get_job_progress(job_id: str) -> JobProgress | None:
 
 
 def get_job_version(job_id: str) -> int:
-    """Get the current version counter for change detection."""
     job = _jobs.get(job_id)
     return job["_version"] if job else -1
 
 
-def _update_job(
-    job_id: str,
-    status: JobStatus,
-    progress: int,
-    message: str,
-    result: TranscriptionResponse | None = None,
-    error: str | None = None,
-) -> None:
-    """Update job state from the worker thread.
-
-    The SSE endpoint polls for changes using the _version counter,
-    so no async queue synchronization is needed.
-    """
-    job = _jobs.get(job_id)
-    if not job:
-        return
-
-    job["status"] = status
-    job["progress"] = progress
-    job["message"] = message
-    job["result"] = result
-    job["error"] = error
-    job["_version"] += 1
-
-    logger.debug(f"Job {job_id}: {status.value} ({progress}%) - {message}")
-
-
-def run_transcription_job(job_id: str) -> None:
-    """Execute transcription in a worker thread.
-
-    This function is submitted to the ThreadPoolExecutor and calls
-    the WhisperTranscriber synchronously. Progress updates are pushed
-    via _update_job which increments the version counter for SSE polling.
-    """
-    job = _jobs.get(job_id)
-    if not job:
-        logger.error(f"Job {job_id} not found when starting worker")
-        return
-
-    file_path = job["file_path"]
-    video_filename = job["video_filename"]
-    language = job["language"]
-
-    try:
-        # Step 1: Loading model
-        _update_job(job_id, JobStatus.LOADING_MODEL, 10, "Loading Whisper model...")
-
-        from app.services.transcriber import WhisperTranscriber
-
-        transcriber = WhisperTranscriber()
-        transcriber.load_model()
-
-        # Step 2: Converting audio with ffmpeg
-        _update_job(job_id, JobStatus.CONVERTING, 30, "Converting audio with ffmpeg...")
-
-        # Step 3: Transcribing
-        _update_job(job_id, JobStatus.TRANSCRIBING, 50, "Transcribing audio...")
-
-        result = transcriber.transcribe_file(file_path, language=language)
-
-        # Build response
-        transcription = TranscriptionResponse(
-            text=result["text"],
-            timestamps=result.get("timestamps"),
-            video_filename=video_filename,
-        )
-
-        # Step 4: Done
-        _update_job(
-            job_id,
-            JobStatus.COMPLETED,
-            100,
-            "Transcription complete!",
-            result=transcription,
-        )
-
-        # Cleanup transcriber resources
-        transcriber.cleanup()
-
-    except Exception as e:
-        logger.error(f"Job {job_id} failed: {e}", exc_info=True)
-        _update_job(
-            job_id, JobStatus.FAILED, 0, f"Transcription failed: {e}", error=str(e)
-        )
-
-
-def submit_job(job_id: str) -> None:
-    """Submit a job to the worker pool for background execution."""
-    _executor.submit(run_transcription_job, job_id)
-    logger.info(f"Job {job_id} submitted to worker pool")
-
-
 def cleanup_job(job_id: str) -> None:
-    """Remove a job from the store."""
+    stop_job(job_id)  # Ensure stopped before cleanup
     _jobs.pop(job_id, None)
 
 
 def shutdown_executor() -> None:
-    """Shutdown the thread pool (call on app shutdown)."""
-    _executor.shutdown(wait=False)
-    logger.info("Worker pool shut down")
+    """Cleanup processes and listener thread."""
+    logger.info("Shutting down job manager...")
+    _stop_listener.set()
+
+    # Terminate all running processes
+    for job_id, p in list(_processes.items()):
+        if p.is_alive():
+            p.terminate()
+            p.join(timeout=1)
+
+    if _listener_thread and _listener_thread.is_alive():
+        _listener_thread.join(timeout=2)
+
+    logger.info("Job manager shutdown complete")

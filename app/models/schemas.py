@@ -96,6 +96,7 @@ class JobStatus(str, Enum):
     TRANSCRIBING = "transcribing"
     COMPLETED = "completed"
     FAILED = "failed"
+    CANCELLED = "cancelled"
 
 
 class JobProgress(BaseModel):
